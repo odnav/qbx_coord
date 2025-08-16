@@ -12,17 +12,10 @@ end
 local function fmtVec(x, y, z)
   return string.format('vec3(%.2f, %.2f, %.2f)', x, y, z)
 end
+
 local function fmtDump(x, y, z, h)
   return string.format('{ coords = vec3(%.2f, %.2f, %.2f), heading = %.1f },', x, y, z, h)
 end
-
-local function fmtVec4(x,y,z,h)
-  return string.format('vec4(%.2f, %.2f, %.2f, %.1f)', x, y, z, h)
-end
-local function fmtDump(x, y, z, h)
-  return string.format('{ coords = vec3(%.2f, %.2f, %.2f), heading = %.1f },', x, y, z, h)
-end
-
 
 local function copy(text)
   if lib and lib.setClipboard then lib.setClipboard(text) end
@@ -43,7 +36,7 @@ local function raycastFromCamera(dist)
   local dest = camPos + (dir * dist)
 
   local handle = StartShapeTestRay(camPos.x, camPos.y, camPos.z, dest.x, dest.y, dest.z, -1, -1, 1)
-  local _, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(handle)
+  local _, hit, endCoords, _, entityHit = GetShapeTestResult(handle)
   return hit == 1, endCoords, entityHit
 end
 
@@ -79,8 +72,7 @@ RegisterCommand('olhar', function()
 
     notify(msg, 'inform')
     print('[olhar] '..msg)
-   copy(fmtDump(pos.x, pos.y, pos.z, heading))
-
+    copy(fmtDump(pos.x, pos.y, pos.z, heading))
   else
     -- PONTO NO MUNDO: heading sugerido do teu ped até ao ponto
     local ped = PlayerPedId()
@@ -93,7 +85,6 @@ RegisterCommand('olhar', function()
     notify(msg, 'inform')
     print('[olhar] '..msg)
     copy(fmtDump(hitPos.x, hitPos.y, hitPos.z, heading))
-
   end
 end, false)
 
@@ -145,12 +136,11 @@ CreateThread(function()
         local ent = data.entity
         if ent and DoesEntityExist(ent) then
           local pos = GetEntityCoords(ent)
-          local model = GetEntityModel(ent)
           local heading = GetEntityHeading(ent)
-          local msg = string.format('Veículo | model: %s | pos: %s | heading: %.1f', tostring(model), fmtVec(pos.x,pos.y,pos.z), heading)
-          notify(msg, 'inform')
-          print('[target] '..msg)
-          copy(fmtVec(pos.x,pos.y,pos.z))
+          local dump = fmtDump(pos.x, pos.y, pos.z, heading)
+          notify('Copiado: '..dump, 'inform')
+          print('[target] Vehicle -> '..dump)
+          copy(dump)
         end
       end
     }
@@ -164,12 +154,11 @@ CreateThread(function()
         local ent = data.entity
         if ent and DoesEntityExist(ent) then
           local pos = GetEntityCoords(ent)
-          local model = GetEntityModel(ent)
           local heading = GetEntityHeading(ent)
-          local msg = string.format('Objeto | model: %s | pos: %s | heading: %.1f', tostring(model), fmtVec(pos.x,pos.y,pos.z), heading)
-          notify(msg, 'inform')
-          print('[target] '..msg)
-          copy(fmtVec(pos.x,pos.y,pos.z))
+          local dump = fmtDump(pos.x, pos.y, pos.z, heading)
+          notify('Copiado: '..dump, 'inform')
+          print('[target] Object -> '..dump)
+          copy(dump)
         end
       end
     }
@@ -183,12 +172,11 @@ CreateThread(function()
         local ent = data.entity
         if ent and DoesEntityExist(ent) then
           local pos = GetEntityCoords(ent)
-          local model = GetEntityModel(ent)
           local heading = GetEntityHeading(ent)
-          local msg = string.format('Ped | model: %s | pos: %s | heading: %.1f', tostring(model), fmtVec(pos.x,pos.y,pos.z), heading)
-          notify(msg, 'inform')
-          print('[target] '..msg)
-          copy(fmtVec(pos.x,pos.y,pos.z))
+          local dump = fmtDump(pos.x, pos.y, pos.z, heading)
+          notify('Copiado: '..dump, 'inform')
+          print('[target] Ped -> '..dump)
+          copy(dump)
         end
       end
     }
