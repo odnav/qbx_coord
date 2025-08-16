@@ -12,6 +12,9 @@ end
 local function fmtVec(x, y, z)
   return string.format('vec3(%.2f, %.2f, %.2f)', x, y, z)
 end
+local function fmtVec4(x,y,z,h)
+  return string.format('vec4(%.2f, %.2f, %.2f, %.1f)', x, y, z, h)
+end
 
 local function copy(text)
   if lib and lib.setClipboard then lib.setClipboard(text) end
@@ -56,20 +59,32 @@ RegisterCommand('olhar', function()
   end
 
   if ent ~= 0 and DoesEntityExist(ent) then
+    -- ENTIDADE: heading real da entidade
     local pos = GetEntityCoords(ent)
     local model = GetEntityModel(ent)
     local heading = GetEntityHeading(ent)
-    local etype = GetEntityType(ent) -- 0=none,1=ped,2=veh,3=obj
+    local etype = GetEntityType(ent) -- 1=ped, 2=veh, 3=obj
     local kind = (etype == 1 and 'Ped') or (etype == 2 and 'Veículo') or (etype == 3 and 'Objeto') or ('Ent '..tostring(etype))
-    local msg = string.format('%s | model: %s | pos: %s | heading: %.1f', kind, tostring(model), fmtVec(pos.x,pos.y,pos.z), heading)
+
+    local msg = string.format('%s | model: %s | pos: %s | heading: %.1f',
+      kind, tostring(model), fmtVec(pos.x,pos.y,pos.z), heading)
+
     notify(msg, 'inform')
     print('[olhar] '..msg)
-    copy(fmtVec(pos.x,pos.y,pos.z))
+    copy(fmtVec4(pos.x,pos.y,pos.z, heading))
+
   else
-    local msg = string.format('Ponto no mundo: %s', fmtVec(hitPos.x, hitPos.y, hitPos.z))
+    -- PONTO NO MUNDO: heading sugerido do teu ped até ao ponto
+    local ped = PlayerPedId()
+    local myPos = GetEntityCoords(ped)
+    local heading = GetHeadingFromVector_2d(hitPos.x - myPos.x, hitPos.y - myPos.y)
+
+    local msg = string.format('Ponto no mundo: %s | heading sugerido: %.1f',
+      fmtVec(hitPos.x, hitPos.y, hitPos.z), heading)
+
     notify(msg, 'inform')
     print('[olhar] '..msg)
-    copy(fmtVec(hitPos.x, hitPos.y, hitPos.z))
+    copy(fmtVec4(hitPos.x, hitPos.y, hitPos.z, heading))
   end
 end, false)
 
