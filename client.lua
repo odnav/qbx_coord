@@ -12,9 +12,17 @@ end
 local function fmtVec(x, y, z)
   return string.format('vec3(%.2f, %.2f, %.2f)', x, y, z)
 end
+local function fmtDump(x, y, z, h)
+  return string.format('{ coords = vec3(%.2f, %.2f, %.2f), heading = %.1f },', x, y, z, h)
+end
+
 local function fmtVec4(x,y,z,h)
   return string.format('vec4(%.2f, %.2f, %.2f, %.1f)', x, y, z, h)
 end
+local function fmtDump(x, y, z, h)
+  return string.format('{ coords = vec3(%.2f, %.2f, %.2f), heading = %.1f },', x, y, z, h)
+end
+
 
 local function copy(text)
   if lib and lib.setClipboard then lib.setClipboard(text) end
@@ -47,7 +55,7 @@ RegisterCommand('coords', function()
   local msg = string.format('Pos: %s | heading: %.1f', fmtVec(pos.x, pos.y, pos.z), h)
   notify(msg, 'inform')
   print('[coords] '..msg)
-  copy(string.format('%s, heading = %.1f', fmtVec(pos.x, pos.y, pos.z), h))
+  copy(fmtDump(pos.x, pos.y, pos.z, h))
 end, false)
 
 -- ===== /olhar =====
@@ -71,7 +79,7 @@ RegisterCommand('olhar', function()
 
     notify(msg, 'inform')
     print('[olhar] '..msg)
-    copy(fmtVec4(pos.x,pos.y,pos.z, heading))
+   copy(fmtDump(pos.x, pos.y, pos.z, heading))
 
   else
     -- PONTO NO MUNDO: heading sugerido do teu ped até ao ponto
@@ -84,7 +92,8 @@ RegisterCommand('olhar', function()
 
     notify(msg, 'inform')
     print('[olhar] '..msg)
-    copy(fmtVec4(hitPos.x, hitPos.y, hitPos.z, heading))
+    copy(fmtDump(hitPos.x, hitPos.y, hitPos.z, heading))
+
   end
 end, false)
 
